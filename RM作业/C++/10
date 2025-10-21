@@ -1,0 +1,84 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct HQ {
+    string name;                 // "red" / "blue"
+    int life;                    // 剩余生命元
+    int seq[5];                  // 制造顺序（存的是兵种下标 0..4）
+    int ptr = 0;                 // 当前顺序位置
+    int nextId = 1;              // 下一名武士编号
+    int cnt[5] = {0};            // 各兵种数量
+    bool stopped = false;        // 是否已停止
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int T; 
+    if (!(cin >> T)) return 0;
+
+    const string typeName[5] = {"dragon","ninja","iceman","lion","wolf"};
+    const string wep[3] = {"sword","bomb","arrow"};
+
+    for (int cs = 1; cs <= T; ++cs) {
+        int M, str[5];                 // 初始生命元、各兵种生命值
+        cin >> M;
+        for (int i = 0; i < 5; ++i) cin >> str[i];
+
+        cout << "Case:" << cs << "\n";
+
+        HQ red{"red", M, {2,3,4,1,0}}, blue{"blue", M, {3,0,1,2,4}};
+        auto try_make = [&](HQ &h, int hour) {
+            if (h.stopped) return;
+            int tried = 0;
+            while (tried < 5) {
+                int tp = h.seq[h.ptr];
+                if (h.life >= str[tp]) {
+                    h.life -= str[tp];
+                    int id = h.nextId++;
+                    int curCnt = ++h.cnt[tp];
+
+                    cout << setw(3) << setfill('0') << hour << ' ';
+                    cout << h.name << ' ' << typeName[tp] << ' ' << id
+                         << " born with strength " << str[tp]
+                         << ',' << curCnt << ' ' << typeName[tp]
+                         << " in " << h.name << " headquarter\n";
+
+                    // 额外信息
+                    if (tp == 0) { // dragon
+                        int w = id % 3;
+                        cout << "It has a " << wep[w]
+                             << ",and it's morale is "
+                             << fixed << setprecision(2)
+                             << (double)h.life / str[0] << "\n";
+                    } else if (tp == 1) { // ninja
+                        cout << "It has a " << wep[id % 3]
+                             << " and a " << wep[(id + 1) % 3] << "\n";
+                    } else if (tp == 2) { // iceman
+                        cout << "It has a " << wep[id % 3] << "\n";
+                    } else if (tp == 3) { // lion
+                        cout << "It's loyalty is " << h.life << "\n";
+                    }
+                    h.ptr = (h.ptr + 1) % 5;
+                    return;
+                } else {
+                    h.ptr = (h.ptr + 1) % 5;
+                    ++tried;
+                }
+            }
+            // 五种都造不了 -> 停止
+            cout << setw(3) << setfill('0') << hour << ' '
+                 << h.name << " headquarter stops making warriors\n";
+            h.stopped = true;
+        };
+
+        int hour = 0;
+        while (!red.stopped || !blue.stopped) {
+            if (!red.stopped) try_make(red, hour);
+            if (!blue.stopped) try_make(blue, hour);
+            ++hour;
+        }
+    }
+    return 0;
+}
