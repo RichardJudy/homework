@@ -1,0 +1,21 @@
+# YOLOv8 数据集配置文件
+# 请根据你的实际数据集路径修改
+
+# 数据集根目录路径（绝对路径或相对路径）
+path: D:/ZM/yolov8/dataset
+
+# 训练、验证、测试图像路径（相对于path）
+train: images/train
+val: images/val
+# test: images/test  # 可选
+
+# 类别数量
+nc: 2
+
+# 类别名称（从0开始编号）
+names:
+  0: goal     # 普通goal（没有r字符）
+  1: goal_r   # 有r字符的goal
+  # 如果有更多类别，可以继续添加：
+  # 2: switch
+
